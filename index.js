@@ -7,7 +7,7 @@ let r = Math.random()*(255-0+1)+0
 let g = Math.random()*(255-0+1)+0
 let b = Math.random()*(255-0+1)+0
 let color = [r,g,b]
-let nn = new fnn([3,21,2], 0.009999999776482582)
+let nn = new fnn([3,1,2], 0.009999999776482582)
 let q = nn.query(color)
 if(math.findmax(q) == 0){
   body.style.background = `white`
