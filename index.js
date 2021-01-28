@@ -2,67 +2,52 @@ let white = document.querySelector(".white")
 let black = document.querySelector(".black")
 let body = document.querySelector(".window")
 
-let answer = [0, 0]
-let r = Math.random()*(255-0+1)+0
-let g = Math.random()*(255-0+1)+0
-let b = Math.random()*(255-0+1)+0
-let color = [r,g,b]
-let nn = new fnn([3,11,2], 0.009999999776482582)
-let q = nn.query(color)
-if(math.findmax(q) == 0){
-  body.style.background = `white`
-  white.style.borderColor = `white`
-  black.style.borderColor = `white`
-
-}else{
-  body.style.background = `black`
-  white.style.borderColor = `black`
-  black.style.borderColor = `black`
+function randomColor() {
+    let str = "0123456789ABCDEF"
+    return "#xxxxxx".replace(
+        /x/g,
+        () => str[Math.floor(Math.random() * str.length)]
+    )
 }
-white.style.background = `rgba(${color[0]}, ${color[1]}, ${color[1]}, 255)`
-black.style.background = `rgba(${color[0]}, ${color[1]}, ${color[1]}, 255)`
+const scale = (num, in_min, in_max, out_min, out_max) => {
+    return ((num - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min
+}
+function convertColor(color) {
+    let number = new Array(6)
+    let str = "0123456789ABCDEF"
+    for (let i = 1; i < color.length; i++) {
+        number[i - 1] = scale(str.indexOf(color[i]), 0, 15, 0, 1)
+    }
+    return number
+}
+let color = randomColor()
+let knn = new KNN(5)
+for (let i = 0; i < 5; i++)
+    knn.addExample(convertColor(color), i % 2 == 0 ? "white" : "black")
+let highligh_div = document.querySelectorAll(".h")
+function predict() {
+    let cl = knn.classify(convertColor(color))
+    console.log(cl)
+    if (cl.label == "white") {
+        highligh_div[0].classList.add("highlight")
+        highligh_div[1].classList.remove("highlight")
+    } else {
+        highligh_div[1].classList.add("highlight")
+        highligh_div[0].classList.remove("highlight")
+    }
+    white.style.background = color
+    black.style.background = color
+}
+predict()
 
-
-white.onclick = ()=>{
-  answer = [1, 0]
-  nn.learn(color, answer)
-  r = Math.random()*(255-0+1)+0
-  g = Math.random()*(255-0+1)+0
-  b = Math.random()*(255-0+1)+0
-  color = [r,g,b]
-  q = nn.query(color)
-  if(math.findmax(q) == 0){
-    body.style.background = `white`
-    white.style.borderColor = `white`
-    black.style.borderColor = `white`
-  }else{
-    body.style.background = `black`
-    white.style.borderColor = `black`
-    black.style.borderColor = `black`
-  }
-  white.style.background = `rgba(${color[0]}, ${color[1]}, ${color[1]}, 255)`
-  black.style.background = `rgba(${color[0]}, ${color[1]}, ${color[1]}, 255)`
-
+white.onclick = () => {
+    knn.addExample(convertColor(color), "white")
+    color = randomColor()
+    predict()
 }
 
-black.onclick = ()=>{
-  answer = [0, 1]
-  nn.learn(color, answer)
-  r = Math.random()*(255-0+1)+0
-  g = Math.random()*(255-0+1)+0
-  b = Math.random()*(255-0+1)+0
-  color = [r,g,b]
-  q = nn.query(color)
-  if(math.findmax(q) == 0){
-    body.style.background = `white`
-    white.style.borderColor = `white`
-    black.style.borderColor = `white`
-  }else{
-    body.style.background = `black`
-    white.style.borderColor = `black`
-    black.style.borderColor = `black`
-  }
-  white.style.background = `rgba(${color[0]}, ${color[1]}, ${color[1]}, 255)`
-  black.style.background = `rgba(${color[0]}, ${color[1]}, ${color[1]}, 255)`
-
+black.onclick = () => {
+    knn.addExample(convertColor(color), "black")
+    color = randomColor()
+    predict()
 }
